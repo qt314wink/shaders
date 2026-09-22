@@ -1,0 +1,93 @@
+{
+  "id": "caustic-water",
+  "version": "0.1.0",
+  "title": "Caustic water",
+  "taxonomyIds": ["refraction", "caustics", "dielectric-interface", "absorption"],
+  "summary": "A dielectric water surface. Caustics are Snell refraction composed with caustic transport of a displacement field; red-preferring absorption tints the volume. No water shader type.",
+  "phenomena": ["refraction", "caustics", "dielectric-fresnel", "spectral-absorption"],
+  "fields": [
+    {
+      "id": "surface-displacement",
+      "kind": "length",
+      "unit": "mm",
+      "domain": "surface",
+      "source": { "type": "analytic", "generator": "surface-waves", "frequency": 1.1 },
+      "range": [-24, 24]
+    },
+    {
+      "id": "volume-density",
+      "kind": "density",
+      "unit": "kg/m3",
+      "domain": "volume",
+      "source": { "type": "constant", "generator": "constant", "value": 1000 },
+      "range": [997, 1025]
+    }
+  ],
+  "parameters": [
+    { "id": "n-air", "kind": "ior-real", "unit": "dimensionless", "value": 1.0003 },
+    { "id": "n-water", "kind": "ior-real", "unit": "dimensionless", "value": 1.333 },
+    { "id": "focus-scale", "kind": "weight", "unit": "dimensionless", "value": 1.4 },
+    {
+      "id": "sigma-a",
+      "kind": "extinction",
+      "unit": "1/m",
+      "spectral": {
+        "wavelengthsNm": [450, 550, 650],
+        "samples": [0.02, 0.06, 0.35]
+      },
+      "notes": "Water absorbs red more than blue."
+    },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "refract",
+      "operator": "refraction-snell",
+      "bind": {
+        "iorInside": { "param": "n-water" },
+        "iorOutside": { "param": "n-air" }
+      }
+    },
+    {
+      "id": "caustics",
+      "operator": "caustic-transport",
+      "bind": {
+        "displacement": { "field": "surface-displacement" },
+        "ior": { "param": "n-water" },
+        "focusScale": { "param": "focus-scale" }
+      }
+    },
+    {
+      "id": "interface",
+      "operator": "fresnel-dielectric",
+      "bind": { "ior": { "param": "n-water" } }
+    },
+    {
+      "id": "absorb",
+      "operator": "volume-absorption",
+      "bind": {
+        "density": { "field": "volume-density" },
+        "sigmaA": { "param": "sigma-a" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "refract", "to": "caustics" },
+      { "from": "caustics", "to": "absorb" },
+      { "from": "interface", "to": "display" },
+      { "from": "absorb", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

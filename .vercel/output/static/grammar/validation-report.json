@@ -1,0 +1,132 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-09-01T05:00:47.450Z",
+  "passed": true,
+  "specimenCount": 12,
+  "operatorCount": 13,
+  "recipeCount": 12,
+  "findings": [
+    {
+      "level": "info",
+      "code": "positive-control",
+      "message": "examples/valid/minimal-thin-film.json passed."
+    },
+    {
+      "level": "info",
+      "code": "negative-control",
+      "message": "examples/invalid/named-effect.json was rejected as required.",
+      "codes": [
+        "recipe-schema",
+        "named-effect-key",
+        "named-effect-flag"
+      ]
+    },
+    {
+      "level": "info",
+      "code": "reuse",
+      "message": "Every catalog operator is used by at least two specimens."
+    }
+  ],
+  "coverage": {
+    "thin-film-interference": [
+      "bismuth-oxide",
+      "holographic-foil",
+      "oil-slick",
+      "soap-film"
+    ],
+    "multilayer-interference": [
+      "butterfly-structural-color",
+      "labradorite",
+      "nacre"
+    ],
+    "diffraction-grating": [
+      "butterfly-structural-color",
+      "holographic-foil"
+    ],
+    "fresnel-dielectric": [
+      "caustic-water",
+      "nacre",
+      "oil-slick",
+      "opalescent-glass",
+      "soap-film"
+    ],
+    "fresnel-conductor": [
+      "bismuth-oxide",
+      "holographic-foil",
+      "molten-chrome"
+    ],
+    "microfacet-scatter": [
+      "bismuth-oxide",
+      "labradorite",
+      "molten-chrome"
+    ],
+    "refraction-snell": [
+      "caustic-water",
+      "opalescent-glass"
+    ],
+    "caustic-transport": [
+      "caustic-water",
+      "oil-slick"
+    ],
+    "volume-scattering": [
+      "cloud",
+      "nebula",
+      "opalescent-glass"
+    ],
+    "volume-absorption": [
+      "caustic-water",
+      "cloud",
+      "nebula",
+      "opalescent-glass"
+    ],
+    "volume-emission": [
+      "molten-chrome",
+      "nebula"
+    ],
+    "view-dependent-weight": [
+      "butterfly-structural-color",
+      "labradorite",
+      "molten-chrome",
+      "nacre",
+      "oil-slick",
+      "soap-film"
+    ],
+    "spectral-integrate": [
+      "bismuth-oxide",
+      "butterfly-structural-color",
+      "caustic-water",
+      "cloud",
+      "holographic-foil",
+      "labradorite",
+      "molten-chrome",
+      "nacre",
+      "nebula",
+      "oil-slick",
+      "opalescent-glass",
+      "soap-film"
+    ]
+  },
+  "reuse": {
+    "thin-film-interference": 4,
+    "multilayer-interference": 3,
+    "diffraction-grating": 2,
+    "fresnel-dielectric": 5,
+    "fresnel-conductor": 3,
+    "microfacet-scatter": 3,
+    "refraction-snell": 2,
+    "caustic-transport": 2,
+    "volume-scattering": 3,
+    "volume-absorption": 4,
+    "volume-emission": 2,
+    "view-dependent-weight": 6,
+    "spectral-integrate": 12
+  },
+  "criteria": {
+    "schemaValid": true,
+    "noNamedEffectFlags": true,
+    "allSpecimensPresent": true,
+    "everyOperatorReused": true,
+    "negativeControlRejected": true,
+    "positiveControlAccepted": true
+  }
+}

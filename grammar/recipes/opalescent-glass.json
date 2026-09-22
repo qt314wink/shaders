@@ -1,0 +1,86 @@
+{
+  "id": "opalescent-glass",
+  "version": "0.1.0",
+  "title": "Opalescent glass",
+  "taxonomyIds": ["scattering", "dielectric-interface", "absorption", "refraction"],
+  "summary": "Nano-inclusions in a dielectric bulk. Opalescence is Rayleigh volume scattering plus Fresnel and Snell at the glass boundary. Blue scatter / warm transmit falls out of λ⁻⁴, not an opal flag.",
+  "phenomena": ["rayleigh-scattering", "dielectric-fresnel", "refraction", "spectral-absorption"],
+  "fields": [
+    {
+      "id": "inclusion-density",
+      "kind": "density",
+      "unit": "kg/m3",
+      "domain": "volume",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 3, "frequency": 4.2 },
+      "range": [0.02, 0.35]
+    }
+  ],
+  "parameters": [
+    { "id": "n-air", "kind": "ior-real", "unit": "dimensionless", "value": 1.0003 },
+    { "id": "n-glass", "kind": "ior-real", "unit": "dimensionless", "value": 1.52 },
+    {
+      "id": "sigma-s",
+      "kind": "scattering-coeff",
+      "unit": "1/m",
+      "spectral": {
+        "wavelengthsNm": [450, 550, 650],
+        "samples": [4.8, 2.1, 1.1]
+      },
+      "notes": "Approximate Rayleigh tilt. A full renderer should evaluate λ⁻⁴ per sample."
+    },
+    { "id": "sigma-a", "kind": "extinction", "unit": "1/m", "value": 0.12 },
+    { "id": "phase", "kind": "phase-function", "unit": "enum", "enum": "rayleigh" },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "scatter",
+      "operator": "volume-scattering",
+      "bind": {
+        "density": { "field": "inclusion-density" },
+        "sigmaS": { "param": "sigma-s" },
+        "phase": { "param": "phase" }
+      }
+    },
+    {
+      "id": "absorb",
+      "operator": "volume-absorption",
+      "bind": {
+        "density": { "field": "inclusion-density" },
+        "sigmaA": { "param": "sigma-a" }
+      }
+    },
+    {
+      "id": "interface",
+      "operator": "fresnel-dielectric",
+      "bind": { "ior": { "param": "n-glass" } }
+    },
+    {
+      "id": "refract",
+      "operator": "refraction-snell",
+      "bind": {
+        "iorInside": { "param": "n-glass" },
+        "iorOutside": { "param": "n-air" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "interface", "to": "refract" },
+      { "from": "refract", "to": "scatter" },
+      { "from": "scatter", "to": "absorb" },
+      { "from": "absorb", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

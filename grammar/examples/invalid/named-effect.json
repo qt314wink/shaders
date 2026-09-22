@@ -1,0 +1,40 @@
+{
+  "id": "fake-oil",
+  "version": "0.1.0",
+  "title": "Named-effect trap",
+  "taxonomyIds": ["thin-film"],
+  "summary": "Negative control. Encodes a material as a boolean flag instead of composing thin-film-interference. The validator must reject this file.",
+  "oilSlick": true,
+  "effect": "oil-slick",
+  "fields": [
+    {
+      "id": "d",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "constant", "generator": "constant", "value": 300 },
+      "range": [300, 300]
+    }
+  ],
+  "parameters": [
+    { "id": "n0", "kind": "ior-real", "unit": "dimensionless", "value": 1.0 },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "look",
+      "operator": "thin-film-interference",
+      "bind": {
+        "thickness": { "field": "d" },
+        "nIncident": { "param": "n0" },
+        "nFilm": { "param": "n0" },
+        "nExit": { "param": "n0" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "look",
+    "edges": [{ "from": "look", "to": "look" }]
+  }
+}

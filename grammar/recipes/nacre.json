@@ -1,0 +1,80 @@
+{
+  "id": "nacre",
+  "version": "0.1.0",
+  "title": "Nacre",
+  "taxonomyIds": ["multilayer", "dielectric-interface", "view-weight"],
+  "summary": "Aragonite tablets separated by protein sheets. Pearl luster is multilayer Bragg interference plus a dielectric Fresnel envelope, not a pearlescent flag.",
+  "phenomena": ["multilayer-interference", "view-dependent-color", "dielectric-fresnel"],
+  "fields": [
+    {
+      "id": "tablet-orientation",
+      "kind": "angle",
+      "unit": "rad",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "lamellar-tilt", "frequency": 1.6 },
+      "range": [-0.18, 0.18]
+    },
+    {
+      "id": "tablet-thickness",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 3, "frequency": 6 },
+      "range": [300, 600]
+    }
+  ],
+  "parameters": [
+    { "id": "n-aragonite", "kind": "ior-real", "unit": "dimensionless", "value": 1.65 },
+    { "id": "n-protein", "kind": "ior-real", "unit": "dimensionless", "value": 1.4 },
+    { "id": "protein-thickness", "kind": "thickness", "unit": "nm", "value": 20 },
+    { "id": "layer-count", "kind": "count", "unit": "dimensionless", "value": 180, "range": [40, 400] },
+    { "id": "view-exp", "kind": "weight", "unit": "dimensionless", "value": 3.2 },
+    { "id": "view-lobe", "kind": "lobe", "unit": "enum", "enum": "grazing" },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "stack",
+      "operator": "multilayer-interference",
+      "bind": {
+        "layerCount": { "param": "layer-count" },
+        "thicknessA": { "field": "tablet-thickness" },
+        "thicknessB": { "param": "protein-thickness" },
+        "nA": { "param": "n-aragonite" },
+        "nB": { "param": "n-protein" },
+        "orientation": { "field": "tablet-orientation" }
+      }
+    },
+    {
+      "id": "interface",
+      "operator": "fresnel-dielectric",
+      "bind": { "ior": { "param": "n-aragonite" } }
+    },
+    {
+      "id": "view",
+      "operator": "view-dependent-weight",
+      "bind": {
+        "exponent": { "param": "view-exp" },
+        "lobe": { "param": "view-lobe" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "stack", "to": "view" },
+      { "from": "interface", "to": "view" },
+      { "from": "view", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

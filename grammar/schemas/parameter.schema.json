@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shader-grammar.dev/schemas/v0.1/parameter.schema.json",
+  "title": "Shader Grammar Parameter",
+  "description": "A typed, unit-bearing optical quantity. Parameters are physics, never material names. A parameter may be a scalar, vector, complex IOR, spectral series, or closed enum.",
+  "type": "object",
+  "additionalProperties": false,
+  "unevaluatedProperties": false,
+  "required": ["id", "kind", "unit"],
+  "propertyNames": {
+    "pattern": "^(id|kind|unit|value|vector|complex|spectral|enum|range|notes)$"
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Stable parameter id. Must not be a material or effect name."
+    },
+    "kind": { "$ref": "#/$defs/kind" },
+    "unit": { "$ref": "#/$defs/unit" },
+    "value": { "type": "number" },
+    "vector": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 3
+    },
+    "complex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n", "k"],
+      "properties": {
+        "n": { "type": "number", "exclusiveMinimum": 0 },
+        "k": { "type": "number", "minimum": 0 }
+      }
+    },
+    "spectral": { "$ref": "#/$defs/spectral" },
+    "enum": { "type": "string" },
+    "range": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "oneOf": [
+    { "required": ["value"] },
+    { "required": ["vector"] },
+    { "required": ["complex"] },
+    { "required": ["spectral"] },
+    { "required": ["enum"] }
+  ],
+  "$defs": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "ior-real",
+        "ior-complex",
+        "thickness",
+        "length",
+        "period",
+        "roughness",
+        "anisotropy",
+        "albedo",
+        "density",
+        "extinction",
+        "scattering-coeff",
+        "weight",
+        "count",
+        "angle",
+        "wavelength",
+        "temperature",
+        "spectral-power",
+        "phase-function",
+        "illuminant",
+        "observer",
+        "lobe"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "enum": [
+        "dimensionless",
+        "nm",
+        "um",
+        "mm",
+        "m",
+        "1/m",
+        "kg/m3",
+        "W/m3/sr/nm",
+        "K",
+        "rad",
+        "deg",
+        "enum"
+      ]
+    },
+    "spectral": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wavelengthsNm", "samples"],
+      "properties": {
+        "wavelengthsNm": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 100, "maximum": 25000 },
+          "minItems": 3
+        },
+        "samples": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 3
+        }
+      }
+    }
+  }
+}

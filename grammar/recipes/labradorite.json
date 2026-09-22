@@ -1,0 +1,86 @@
+{
+  "id": "labradorite",
+  "version": "0.1.0",
+  "title": "Labradorite",
+  "taxonomyIds": ["multilayer", "microfacet", "view-weight"],
+  "summary": "Exsolution lamellae in feldspar. Labradorescence is the same multilayer operator as nacre, with much lower IOR contrast, a tighter orientation field, and a microfacet envelope.",
+  "phenomena": ["multilayer-interference", "lamellar-flash", "view-dependent-color"],
+  "fields": [
+    {
+      "id": "lamellar-orientation",
+      "kind": "angle",
+      "unit": "rad",
+      "domain": "surface",
+      "source": { "type": "analytic", "generator": "anisotropic-orientation", "frequency": 0.4 },
+      "range": [-0.08, 0.08],
+      "notes": "Flash occurs only when the viewing vector aligns with the lamellar normal."
+    },
+    {
+      "id": "cleavage-roughness",
+      "kind": "roughness",
+      "unit": "dimensionless",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 2, "frequency": 3 },
+      "range": [0.04, 0.18]
+    }
+  ],
+  "parameters": [
+    { "id": "n-lamella-a", "kind": "ior-real", "unit": "dimensionless", "value": 1.56 },
+    { "id": "n-lamella-b", "kind": "ior-real", "unit": "dimensionless", "value": 1.53, "notes": "Δn ≈ 0.03 — enough for coherent interference, not a pigment." },
+    { "id": "thickness-a", "kind": "thickness", "unit": "nm", "value": 140 },
+    { "id": "thickness-b", "kind": "thickness", "unit": "nm", "value": 120 },
+    { "id": "layer-count", "kind": "count", "unit": "dimensionless", "value": 64 },
+    { "id": "anisotropy", "kind": "anisotropy", "unit": "dimensionless", "value": 0.72 },
+    { "id": "view-exp", "kind": "weight", "unit": "dimensionless", "value": 8.5 },
+    { "id": "view-lobe", "kind": "lobe", "unit": "enum", "enum": "specular" },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "stack",
+      "operator": "multilayer-interference",
+      "bind": {
+        "layerCount": { "param": "layer-count" },
+        "thicknessA": { "param": "thickness-a" },
+        "thicknessB": { "param": "thickness-b" },
+        "nA": { "param": "n-lamella-a" },
+        "nB": { "param": "n-lamella-b" },
+        "orientation": { "field": "lamellar-orientation" }
+      }
+    },
+    {
+      "id": "microfacet",
+      "operator": "microfacet-scatter",
+      "bind": {
+        "roughness": { "field": "cleavage-roughness" },
+        "anisotropy": { "param": "anisotropy" }
+      }
+    },
+    {
+      "id": "view",
+      "operator": "view-dependent-weight",
+      "bind": {
+        "exponent": { "param": "view-exp" },
+        "lobe": { "param": "view-lobe" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "stack", "to": "view" },
+      { "from": "microfacet", "to": "view" },
+      { "from": "view", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

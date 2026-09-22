@@ -1,0 +1,88 @@
+{
+  "id": "butterfly-structural-color",
+  "version": "0.1.0",
+  "title": "Butterfly structural color",
+  "taxonomyIds": ["multilayer", "grating", "view-weight"],
+  "summary": "Chitin scale architecture: a multilayer stack for the Bragg peak plus a ridge grating for angular selectivity. Morpho-type blue is composed, not a named morpho shader.",
+  "phenomena": ["multilayer-interference", "diffraction", "view-dependent-color"],
+  "fields": [
+    {
+      "id": "scale-orientation",
+      "kind": "angle",
+      "unit": "rad",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "anisotropic-orientation", "frequency": 8 },
+      "range": [-0.12, 0.12]
+    },
+    {
+      "id": "ridge-period",
+      "kind": "period",
+      "unit": "um",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 2, "frequency": 12 },
+      "range": [0.6, 1.1]
+    }
+  ],
+  "parameters": [
+    { "id": "n-chitin", "kind": "ior-real", "unit": "dimensionless", "value": 1.56 },
+    { "id": "n-air-gap", "kind": "ior-real", "unit": "dimensionless", "value": 1.0 },
+    { "id": "lamella-thickness", "kind": "thickness", "unit": "nm", "value": 90 },
+    { "id": "gap-thickness", "kind": "thickness", "unit": "nm", "value": 70 },
+    { "id": "layer-count", "kind": "count", "unit": "dimensionless", "value": 10 },
+    { "id": "groove-depth", "kind": "length", "unit": "nm", "value": 220 },
+    { "id": "orders", "kind": "count", "unit": "dimensionless", "value": 3 },
+    { "id": "view-exp", "kind": "weight", "unit": "dimensionless", "value": 6.0 },
+    { "id": "view-lobe", "kind": "lobe", "unit": "enum", "enum": "specular" },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "stack",
+      "operator": "multilayer-interference",
+      "bind": {
+        "layerCount": { "param": "layer-count" },
+        "thicknessA": { "param": "lamella-thickness" },
+        "thicknessB": { "param": "gap-thickness" },
+        "nA": { "param": "n-chitin" },
+        "nB": { "param": "n-air-gap" },
+        "orientation": { "field": "scale-orientation" }
+      }
+    },
+    {
+      "id": "ridges",
+      "operator": "diffraction-grating",
+      "bind": {
+        "period": { "field": "ridge-period" },
+        "depth": { "param": "groove-depth" },
+        "orientation": { "field": "scale-orientation" },
+        "orders": { "param": "orders" }
+      }
+    },
+    {
+      "id": "view",
+      "operator": "view-dependent-weight",
+      "bind": {
+        "exponent": { "param": "view-exp" },
+        "lobe": { "param": "view-lobe" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "stack", "to": "view" },
+      { "from": "ridges", "to": "view" },
+      { "from": "view", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

@@ -1,0 +1,109 @@
+Here is the adapter I’d append to all three saved Grok agents.
+Writing
+GROK SURFACE ROUTER
+You exist across three Grok execution surfaces.
+Do not behave identically in each surface.
+GROK CHAT — THINK / INVESTIGATE / DECIDE
+Primary agent: LOOMKEEPER
+Secondary roles: NACRE ATELIER for visual interpretation. PRISM FORGE for architectural feasibility.
+Use Chat for:
+research niche selection competitive analysis repository strategy semantic reconciliation ontology design visual analysis reverse-prompt reasoning adversarial critique experiment design architecture decision-making.
+Chat output should converge toward a decision or executable specification.
+Do not implement large bodies of code when Build is the appropriate surface.
+When implementation becomes appropriate, emit:
+BUILD_HANDOFF
+containing:
+objective repo branch/base relevant files existing authority constraints required artifacts tests definition of done stop conditions evidence to return.
+GROK BUILD — IMPLEMENT / TEST / AUTOMATE
+Primary agent: PRISM FORGE
+Embedded adversary: LOOMKEEPER
+Visual authority: NACRE ATELIER specifications.
+Use Grok Build for:
+repository inspection coding web/app implementation shader implementation GLSL/WGSL React/R3F/Three.js schema work tests CI scripts MCP integration automation data pipelines asset ingestion repository reconciliation experiment harnesses.
+Before building, consume the supplied BUILD_HANDOFF.
+Do not reopen settled design questions unless implementation evidence invalidates them.
+Prefer:
+read-only preflight small bounded changes tests receipts diffs reversible commits.
+For long-running bounded work, use autonomous execution only after objective, constraints and stop gates are explicit.
+Return:
+BUILD_RECEIPT TEST_RECEIPT DISCOVERED_CONFLICTS UPSTREAM_KNOWLEDGE VISUAL_OUTPUT_REQUESTS.
+Send visual-generation requirements to Imagine instead of approximating them badly in code.
+GROK IMAGINE — GENERATE / TRANSFORM / EXPERIMENT
+Primary agent: NACRE ATELIER
+Semantic validator: LOOMKEEPER.
+Implementation consumer: PRISM FORGE.
+Use Imagine for:
+image generation image editing style transfer multi-reference exploration video generation image-to-video visual variants campaign media material studies texture studies UI visual assets thumbnails world-building style repair visual mutation controlled style fusion.
+Every serious generation should receive a GENERATION_SPEC.
+Preserve:
+style ID style version source references prompt negative constraints intended invariants material language composition lighting camera motion duration aspect ratio generation purpose.
+Do not declare generated observations canonical.
+Return useful generations to Loomkeeper for comparison and evidence capture.
+Return implementation-ready assets and visual specifications to Prism Forge.
+CROSS-SURFACE LOOP
+CHAT understands and decides.
+↓
+BUILD implements and instruments.
+↓
+IMAGINE creates and explores visual media.
+↓
+LOOMKEEPER evaluates outputs against evidence.
+↓
+CHAT decides what survives.
+↓
+BUILD integrates approved results.
+Do not repeatedly transmit entire histories.
+Exchange typed artifacts and deltas.
+DEFAULT AUTONOMY
+Do not ask for user steering when:
+the decision is reversible, existing project rules resolve it, one option clearly dominates, or the task is already inside the approved scope.
+Record the decision and continue.
+Interrupt only for:
+irreversible actions publication meaningful spending credential changes legal/licensing uncertainty destructive data operations genuinely consequential close decisions.
+The goal is one human instruction followed by useful autonomous work, not conversational dependency.
+Grok Imagine is much more relevant to your system now than it would have been even a few months ago. Imagine Image 2.0 supports generation and editing with stronger instruction following and visual consistency, while Imagine Video 1.5 supports image-to-video, motion/physics, audio and longer directed clips; Imagine also now has Projects, parallel generation agents and library search. � That makes your proposed StyleFingerprint → GenerationSpec → Compare → Refine loop quite practical.
+SpaceXAI +1
+Your Media.io membership is potentially a very useful fourth layer, but I would use it differently: as a model router and media-processing bench, not another reasoning agent. Media.io currently exposes a CLI intended for AI-agent workflows as well as a unified image/video API spanning multiple model families. Its current platform lists models/workflows around Kling, Wan, Veo, Seedance, Hailuo, Vidu, Flux and others. �
+Media.io +1
+That creates a nice division:
+Nacre Atelier decides what needs to be generated.
+Grok Imagine is one renderer.
+Media.io is another router/rendering bench.
+ComfyUI is the controlled/local experimental laboratory.
+Loomkeeper compares the results.
+So Nacre can issue the same GenerationSpec to Grok Imagine, Media.io, ComfyUI/Wan, or another provider, and Loomkeeper evaluates provider × model × seed × prompt × parameters rather than letting your visual vocabulary become vendor-specific.
+One caution: I would not assume your normal Media.io Premium membership automatically equals developer API credits. Media.io currently exposes its API pricing/credits separately, although its CLI authenticates to a Media.io account and can report/use the available generation access. �
+Media.io +1
+For VS Code/Cursor, I’d configure the stack this way:
+VS Code = Microsoft Foundry + repository laboratory. The current Foundry Toolkit can create prompt or hosted agents, evaluate models, and bring in custom OpenAI-compatible models. Its custom-model workflow asks for endpoint, model name and API key. �
+Visual Studio Code +1
+Cursor = daily coding workspace. Cursor currently supports built-in GPT-5.6 Sol as well as Grok models, and also supports OpenAI BYOK under Settings → Models. Cursor notes that its own BYOK path currently applies to supported chat models, while Tab and some Cursor-specific functionality continue using Cursor's own systems. �
+Cursor +1
+Grok Build = portable agent harness inside either environment. Run it in the integrated terminal, or use its ACP server where your host supports ACP:
+grok agent stdio
+It can also run headlessly, emit JSON/streaming JSON, use MCP servers, and discover project configuration through .grok/config.toml. �
+Grok API Documentation +1
+A particularly nice interoperability detail: the official Grok Build implementation can read Cursor MCP definitions from .cursor/mcp.json, in addition to native Grok and standard MCP configuration. That lets the same project expose a substantially shared tool layer instead of maintaining separate integrations for every agent. �
+GitHub
+For your OpenAI key: I opened the secure OpenAI API-key setup flow for you, named VSCode Foundry. Create/copy or download the key from that widget; the raw key never needs to appear in this chat.
+There are two different Foundry authentication cases, and this is worth getting right:
+Direct OpenAI inside Foundry Toolkit: your new OpenAI Platform key is appropriate. Microsoft's VS Code documentation currently shows OpenAI's chat-completions endpoint and a Bearer authorization header for this configuration. �
+Visual Studio Code
+Endpoint:
+https://api.openai.com/v1/chat/completions
+
+Authentication:
+Authorization: Bearer <YOUR_OPENAI_API_KEY>
+A model deployed inside Microsoft Foundry: use that Foundry deployment's credential/endpoint instead. An OpenAI Platform key does not magically authenticate a Microsoft-hosted Foundry deployment.
+And in Cursor, if you specifically want BYOK OpenAI, go to Cursor Settings → Models → OpenAI and provide the OpenAI key there. � I would not do this simply because GPT-5.6 Sol is available, though—Cursor already exposes GPT-5.6 Sol through its own model system. Use the OpenAI key when you specifically want direct OpenAI API usage/billing or you're developing something that itself calls OpenAI.
+Cursor
+The architecture I ultimately want for you is less “install every AI in every editor” and more:
+Foundry = model/agent evaluation and deployed-agent experiments.
+Cursor/VS Code = human workspace.
+Grok Build = one executable coding harness.
+Grok Chat = research/adversarial reasoning.
+Grok Imagine = one visual renderer.
+Media.io = multi-provider visual generation/router.
+ComfyUI = reproducible local visual laboratory.
+Loomkeeper = provenance and comparative intelligence across all of them.
+That gives you one shared grammar with several specialized engines, rather than six assistants each developing a slightly different understanding of what “nacre,” “motion profile,” “style,” or “approved experiment” means.

@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shader-grammar.dev/schemas/v0.1/recipe.schema.json",
+  "title": "Shader Grammar Recipe",
+  "description": "A material is a composition of shared operators, fields, and parameters. Recipes must not introduce material-named flags, effect booleans, or one-off operators.",
+  "type": "object",
+  "additionalProperties": false,
+  "unevaluatedProperties": false,
+  "required": [
+    "id",
+    "version",
+    "title",
+    "taxonomyIds",
+    "summary",
+    "fields",
+    "parameters",
+    "nodes",
+    "graph"
+  ],
+  "propertyNames": {
+    "pattern": "^(id|version|title|taxonomyIds|summary|phenomena|fields|parameters|nodes|graph|evaluation|notes)$"
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^0\\.1\\.\\d+$"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "taxonomyIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+    },
+    "summary": { "type": "string", "minLength": 40 },
+    "phenomena": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "thin-film-interference",
+          "multilayer-interference",
+          "diffraction",
+          "view-dependent-color",
+          "variable-thickness",
+          "lamellar-flash",
+          "conductor-fresnel",
+          "dielectric-fresnel",
+          "thermal-emission",
+          "caustics",
+          "refraction",
+          "mie-scattering",
+          "rayleigh-scattering",
+          "henyey-greenstein",
+          "volume-emission",
+          "spectral-absorption"
+        ]
+      }
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "https://shader-grammar.dev/schemas/v0.1/field.schema.json" }
+    },
+    "parameters": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "https://shader-grammar.dev/schemas/v0.1/parameter.schema.json" }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "graph": { "$ref": "#/$defs/graph" },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "illuminant": { "type": "string", "enum": ["D65", "A", "E"] },
+        "observer": { "type": "string", "enum": ["CIE-1931-2deg"] }
+      }
+    },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "operator", "bind"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "thin-film-interference",
+            "multilayer-interference",
+            "diffraction-grating",
+            "fresnel-dielectric",
+            "fresnel-conductor",
+            "microfacet-scatter",
+            "refraction-snell",
+            "caustic-transport",
+            "volume-scattering",
+            "volume-absorption",
+            "volume-emission",
+            "view-dependent-weight",
+            "spectral-integrate"
+          ]
+        },
+        "bind": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/binding" }
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["param"] },
+        { "required": ["field"] }
+      ],
+      "properties": {
+        "param": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "field": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["output", "edges"],
+      "properties": {
+        "output": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "edges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

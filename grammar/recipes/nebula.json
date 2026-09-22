@@ -1,0 +1,85 @@
+{
+  "id": "nebula",
+  "version": "0.1.0",
+  "title": "Nebula",
+  "taxonomyIds": ["scattering", "emission", "absorption"],
+  "summary": "Low-density participating medium with mixed phase, dust absorption, and spectral line emission. Same volume operators as cloud; emission and spectral peaks do the rest.",
+  "phenomena": ["henyey-greenstein", "volume-emission", "spectral-absorption"],
+  "fields": [
+    {
+      "id": "gas-density",
+      "kind": "density",
+      "unit": "kg/m3",
+      "domain": "volume",
+      "source": { "type": "procedural", "generator": "worley", "octaves": 4, "frequency": 0.9 },
+      "range": [0.0, 0.12]
+    },
+    {
+      "id": "line-emission",
+      "kind": "spectral-power",
+      "unit": "W/m3/sr/nm",
+      "domain": "spectral",
+      "source": {
+        "type": "analytic",
+        "generator": "spectral-peak",
+        "peaksNm": [486.1, 500.7, 656.3],
+        "bandwidthNm": 6
+      },
+      "range": [0, 4],
+      "notes": "Hβ, [O III], Hα — line list is data, not a nebula operator."
+    }
+  ],
+  "parameters": [
+    { "id": "sigma-s", "kind": "scattering-coeff", "unit": "1/m", "value": 0.35 },
+    { "id": "sigma-a", "kind": "extinction", "unit": "1/m", "value": 0.18 },
+    { "id": "phase", "kind": "phase-function", "unit": "enum", "enum": "hg" },
+    { "id": "g", "kind": "anisotropy", "unit": "dimensionless", "value": 0.35 },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "E" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "scatter",
+      "operator": "volume-scattering",
+      "bind": {
+        "density": { "field": "gas-density" },
+        "sigmaS": { "param": "sigma-s" },
+        "phase": { "param": "phase" },
+        "g": { "param": "g" }
+      }
+    },
+    {
+      "id": "absorb",
+      "operator": "volume-absorption",
+      "bind": {
+        "density": { "field": "gas-density" },
+        "sigmaA": { "param": "sigma-a" }
+      }
+    },
+    {
+      "id": "emit",
+      "operator": "volume-emission",
+      "bind": {
+        "density": { "field": "gas-density" },
+        "radiance": { "field": "line-emission" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "scatter", "to": "display" },
+      { "from": "absorb", "to": "display" },
+      { "from": "emit", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "E", "observer": "CIE-1931-2deg" }
+}

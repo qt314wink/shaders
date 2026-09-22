@@ -1,0 +1,171 @@
+[
+  {
+    "id": "thin-film-interference",
+    "title": "Thin-film interference",
+    "family": "interference",
+    "reusable": true,
+    "description": "Two-interface Airy interference. Color is a function of optical path 2 n d cos θ, not a material flag. Oil slicks, soap films, oxide tarnish, and lacquered foil all bind this operator.",
+    "outputs": ["spectral-radiance"],
+    "references": ["Heavens 1955", "Belcour & Barla 2017"],
+    "slots": {
+      "thickness": { "kind": "thickness", "unit": "nm", "required": true, "field": "required" },
+      "nIncident": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "nFilm": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "nExit": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "multilayer-interference",
+    "title": "Multilayer interference",
+    "family": "interference",
+    "reusable": true,
+    "description": "N-period Bragg / lamellar stack. Peak wavelength is set by bilayer optical thickness and IOR contrast. Nacre, labradorite, and Morpho-type scales share this operator.",
+    "outputs": ["spectral-radiance"],
+    "references": ["Kinoshita 2008", "Nassau 2001"],
+    "slots": {
+      "layerCount": { "kind": "count", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "thicknessA": { "kind": "thickness", "unit": "nm", "required": true, "field": "allowed" },
+      "thicknessB": { "kind": "thickness", "unit": "nm", "required": true, "field": "allowed" },
+      "nA": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "nB": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "orientation": { "kind": "angle", "unit": "rad", "required": true, "field": "required" }
+    }
+  },
+  {
+    "id": "diffraction-grating",
+    "title": "Diffraction grating",
+    "family": "diffraction",
+    "reusable": true,
+    "description": "Periodic microstructure. The grating equation m λ = p (sin θi + sin θd) produces spectral orders. Butterfly scale ridges and embossed holographic foil bind the same operator with different periods.",
+    "outputs": ["spectral-radiance"],
+    "references": ["Born & Wolf", "Kinoshita 2008"],
+    "slots": {
+      "period": { "kind": "period", "unit": "um", "required": true, "field": "allowed" },
+      "depth": { "kind": "length", "unit": "nm", "required": true, "field": "allowed" },
+      "orientation": { "kind": "angle", "unit": "rad", "required": true, "field": "allowed" },
+      "orders": { "kind": "count", "unit": "dimensionless", "required": true, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "fresnel-dielectric",
+    "title": "Dielectric Fresnel",
+    "family": "interface",
+    "reusable": true,
+    "description": "Real-IOR interface reflectance (Schlick / exact Fresnel). Used wherever a dielectric boundary is visible: films, nacre, water, glass.",
+    "outputs": ["bsdf-lobe", "weight"],
+    "slots": {
+      "ior": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "fresnel-conductor",
+    "title": "Conductor Fresnel",
+    "family": "interface",
+    "reusable": true,
+    "description": "Complex-IOR interface for metals. n and k may be spectral. Foil aluminum, bismuth, and molten chrome share this operator.",
+    "outputs": ["bsdf-lobe"],
+    "slots": {
+      "ior": { "kind": "ior-complex", "unit": "dimensionless", "required": true, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "microfacet-scatter",
+    "title": "Microfacet scatter",
+    "family": "interface",
+    "reusable": true,
+    "description": "GGX/Beckmann distribution of normals. Roughness and anisotropy are geometric, independent of the Fresnel term they modulate.",
+    "outputs": ["bsdf-lobe"],
+    "slots": {
+      "roughness": { "kind": "roughness", "unit": "dimensionless", "required": true, "field": "allowed" },
+      "anisotropy": { "kind": "anisotropy", "unit": "dimensionless", "required": true, "field": "allowed" }
+    }
+  },
+  {
+    "id": "refraction-snell",
+    "title": "Snell refraction",
+    "family": "geometric",
+    "reusable": true,
+    "description": "Transmission through a dielectric interface. eta is the relative IOR. Water and bulk glass both bind this operator.",
+    "outputs": ["throughput"],
+    "slots": {
+      "iorInside": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "iorOutside": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "caustic-transport",
+    "title": "Caustic transport",
+    "family": "geometric",
+    "reusable": true,
+    "description": "Focusing of refracted or reflected light by a displacement field. Intensity follows the inverse Jacobian of the refracted mapping. Water surfaces are the type specimen; oil on waves reuses it.",
+    "outputs": ["spectral-radiance"],
+    "slots": {
+      "displacement": { "kind": "length", "unit": "mm", "required": true, "field": "required" },
+      "ior": { "kind": "ior-real", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "focusScale": { "kind": "weight", "unit": "dimensionless", "required": true, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "volume-scattering",
+    "title": "Volume scattering",
+    "family": "volume",
+    "reusable": true,
+    "description": "In-scattering with a closed phase-function enum (Henyey-Greenstein, Rayleigh, Mie). Cloud, nebula, and opalescent glass differ by density, albedo, and phase — not by separate operators.",
+    "outputs": ["spectral-radiance"],
+    "slots": {
+      "density": { "kind": "density", "unit": "kg/m3", "required": true, "field": "required" },
+      "sigmaS": { "kind": "scattering-coeff", "unit": "1/m", "required": true, "field": "allowed" },
+      "phase": { "kind": "phase-function", "unit": "enum", "required": true, "field": "forbidden", "enumValues": ["hg", "rayleigh", "mie"] },
+      "g": { "kind": "anisotropy", "unit": "dimensionless", "required": false, "field": "forbidden", "notes": "Used when phase is hg or mie." }
+    }
+  },
+  {
+    "id": "volume-absorption",
+    "title": "Volume absorption",
+    "family": "volume",
+    "reusable": true,
+    "description": "Beer-Lambert extinction. sigmaA may be spectral (water red-absorb, nebular dust). Shared by participating media and tinted dielectrics.",
+    "outputs": ["throughput"],
+    "slots": {
+      "density": { "kind": "density", "unit": "kg/m3", "required": true, "field": "required" },
+      "sigmaA": { "kind": "extinction", "unit": "1/m", "required": true, "field": "allowed" }
+    }
+  },
+  {
+    "id": "volume-emission",
+    "title": "Volume emission",
+    "family": "volume",
+    "reusable": true,
+    "description": "Additive spectral emission in a medium or at a hot surface treated as a thin emitting layer. Nebular lines and molten-metal blackbody both bind this operator.",
+    "outputs": ["spectral-radiance"],
+    "slots": {
+      "density": { "kind": "density", "unit": "kg/m3", "required": true, "field": "allowed" },
+      "radiance": { "kind": "spectral-power", "unit": "W/m3/sr/nm", "required": false, "field": "allowed" },
+      "temperature": { "kind": "temperature", "unit": "K", "required": false, "field": "forbidden" }
+    }
+  },
+  {
+    "id": "view-dependent-weight",
+    "title": "View-dependent weight",
+    "family": "evaluation",
+    "reusable": true,
+    "description": "Weights upstream radiance by a viewing/lighting lobe (fresnel, grazing, retro, specular). Structural color is directional because of this operator, not because of a material-named anisotropic flag.",
+    "outputs": ["weight"],
+    "slots": {
+      "exponent": { "kind": "weight", "unit": "dimensionless", "required": true, "field": "forbidden" },
+      "lobe": { "kind": "lobe", "unit": "enum", "required": true, "field": "forbidden", "enumValues": ["fresnel", "grazing", "retro", "specular"] }
+    }
+  },
+  {
+    "id": "spectral-integrate",
+    "title": "Spectral integrate",
+    "family": "evaluation",
+    "reusable": true,
+    "description": "Converts spectral radiance to display RGB under a standard illuminant and observer. Every colored recipe ends here so that encoding stays spectral until evaluation.",
+    "outputs": ["display-rgb"],
+    "slots": {
+      "illuminant": { "kind": "illuminant", "unit": "enum", "required": true, "field": "forbidden", "enumValues": ["D65", "A", "E"] },
+      "observer": { "kind": "observer", "unit": "enum", "required": true, "field": "forbidden", "enumValues": ["CIE-1931-2deg"] }
+    }
+  }
+]

@@ -1,0 +1,122 @@
+version: "0.1.0"
+id: shader-grammar-material-taxonomy
+principle: >
+  Materials are classified by optical mechanism, not by trade name, pigment,
+  or marketing effect. Words like iridescent, pearlescent, holographic, and
+  opalescent are appearance aliases that map onto mechanisms. A specimen is
+  valid only if every tag here resolves to a catalog operator.
+
+families:
+  - id: interference
+    title: Interference
+    description: >
+      Color from optical-path phase in a film or stack. Thickness and IOR
+      contrast are the degrees of freedom, not a hue slider.
+    members:
+      - id: thin-film
+        operators: [thin-film-interference]
+      - id: multilayer
+        operators: [multilayer-interference]
+  - id: diffraction
+    title: Diffraction
+    description: >
+      Color from periodic microstructure. Period, groove depth, and viewing
+      angle set the orders — not a rainbow texture.
+    members:
+      - id: grating
+        operators: [diffraction-grating]
+  - id: interface
+    title: Interface
+    description: >
+      Energy split at a boundary. Dielectrics use real IOR; conductors use
+      complex IOR. Roughness is a separate geometric operator.
+    members:
+      - id: dielectric-interface
+        operators: [fresnel-dielectric]
+      - id: conductor-interface
+        operators: [fresnel-conductor]
+      - id: microfacet
+        operators: [microfacet-scatter]
+  - id: geometric-transport
+    title: Geometric transport
+    description: >
+      Rays bent by a dielectric interface, then focused by a displacement
+      field. Caustics are a consequence of refraction plus geometry.
+    members:
+      - id: refraction
+        operators: [refraction-snell]
+      - id: caustics
+        operators: [caustic-transport]
+  - id: volume
+    title: Volume transport
+    description: >
+      In-scattering, absorption, and emission in a participating medium.
+      Phase function and density field do the work; cloud and nebula are
+      not separate shader types.
+    members:
+      - id: scattering
+        operators: [volume-scattering]
+      - id: absorption
+        operators: [volume-absorption]
+      - id: emission
+        operators: [volume-emission]
+  - id: evaluation
+    title: Evaluation
+    description: >
+      View weighting and spectral-to-display conversion. Shared by every
+      recipe that produces color.
+    members:
+      - id: view-weight
+        operators: [view-dependent-weight]
+      - id: display
+        operators: [spectral-integrate]
+
+aliases:
+  iridescent: [thin-film, multilayer, grating]
+  pearlescent: [multilayer]
+  labradorescence: [multilayer]
+  holographic: [grating, thin-film]
+  opalescence: [scattering]
+  metallic: [conductor-interface, microfacet]
+  molten: [conductor-interface, emission, microfacet]
+  watery: [refraction, caustics, dielectric-interface]
+  nebular: [scattering, absorption, emission]
+  cloudy: [scattering, absorption]
+
+specimens:
+  oil-slick:
+    primary: [thin-film]
+    secondary: [dielectric-interface, caustics, view-weight]
+  soap-film:
+    primary: [thin-film]
+    secondary: [dielectric-interface, view-weight]
+  nacre:
+    primary: [multilayer]
+    secondary: [dielectric-interface, view-weight]
+  labradorite:
+    primary: [multilayer]
+    secondary: [microfacet, view-weight]
+  butterfly-structural-color:
+    primary: [multilayer, grating]
+    secondary: [view-weight]
+  holographic-foil:
+    primary: [grating, thin-film]
+    secondary: [conductor-interface]
+  bismuth-oxide:
+    primary: [thin-film, conductor-interface]
+    secondary: [microfacet]
+  molten-chrome:
+    primary: [conductor-interface, microfacet]
+    secondary: [emission, view-weight]
+  caustic-water:
+    primary: [refraction, caustics]
+    secondary: [dielectric-interface, absorption]
+  cloud:
+    primary: [scattering]
+    secondary: [absorption]
+  nebula:
+    primary: [scattering, emission]
+    secondary: [absorption]
+  opalescent-glass:
+    primary: [scattering]
+    secondary: [dielectric-interface, absorption, refraction]

@@ -1,0 +1,168 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;500;600&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #090b0e;
+  --color-surface: #12151a;
+  --color-elevated: #1a1e26;
+  --color-void: #050608;
+  --color-fg: #ece7dc;
+  --color-muted: #8b877e;
+  --color-subtle: #5c5955;
+  --color-accent: #c5cdc8;
+  --color-accent-fg: #0c1014;
+  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
+  --color-pass: #8fbfa0;
+  --color-danger: #d46a5a;
+  --color-signal: #7eb0b8;
+  --color-botanical: #7d9a7e;
+  --color-warn: #c4a574;
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
+  --tracking-caps: 0.16em;
+  --tracking-display: -0.03em;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+.preview-canvas {
+  display: block;
+  background: var(--color-void);
+}
+
+.specimen-rail {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.75rem;
+  scrollbar-width: thin;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  text-decoration: none;
+}
+
+.wordmark-text {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: var(--tracking-display);
+  line-height: 1;
+  background-image: linear-gradient(
+    105deg,
+    var(--color-fg) 0%,
+    var(--color-fg) 38%,
+    var(--color-signal) 50%,
+    var(--color-fg) 62%,
+    var(--color-fg) 100%
+  );
+  background-size: 240% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: aurelith-glyph 9s var(--ease-out) infinite;
+}
+
+.identity-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.identity-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 28%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-signal) 22%, transparent),
+    transparent
+  );
+  animation: aurelith-sweep 11s var(--ease-out) infinite;
+}
+
+@keyframes aurelith-glyph {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes aurelith-sweep {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(460%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .wordmark-text {
+    background: none;
+    color: var(--color-fg);
+    -webkit-text-fill-color: var(--color-fg);
+  }
+}

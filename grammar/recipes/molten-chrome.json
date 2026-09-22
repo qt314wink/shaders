@@ -1,0 +1,89 @@
+{
+  "id": "molten-chrome",
+  "version": "0.1.0",
+  "title": "Molten chrome",
+  "taxonomyIds": ["conductor-interface", "microfacet", "emission", "view-weight"],
+  "summary": "Liquid chromium: complex-IOR Fresnel, convection-driven roughness, and thermal emission. Heat is volume-emission with a blackbody temperature, not a moltenChrome flag.",
+  "phenomena": ["conductor-fresnel", "thermal-emission", "view-dependent-color"],
+  "fields": [
+    {
+      "id": "convection-roughness",
+      "kind": "roughness",
+      "unit": "dimensionless",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 5, "frequency": 1.8 },
+      "range": [0.02, 0.22]
+    },
+    {
+      "id": "flow-anisotropy",
+      "kind": "anisotropy",
+      "unit": "dimensionless",
+      "domain": "surface",
+      "source": { "type": "analytic", "generator": "anisotropic-orientation", "frequency": 0.6 },
+      "range": [0.2, 0.7]
+    }
+  ],
+  "parameters": [
+    {
+      "id": "ior-chrome",
+      "kind": "ior-complex",
+      "unit": "dimensionless",
+      "complex": { "n": 3.2, "k": 4.2 }
+    },
+    { "id": "temperature", "kind": "temperature", "unit": "K", "value": 1900, "range": [1400, 2200] },
+    { "id": "emit-density", "kind": "density", "unit": "kg/m3", "value": 1.0 },
+    { "id": "view-exp", "kind": "weight", "unit": "dimensionless", "value": 2.0 },
+    { "id": "view-lobe", "kind": "lobe", "unit": "enum", "enum": "fresnel" },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "A" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "metal",
+      "operator": "fresnel-conductor",
+      "bind": { "ior": { "param": "ior-chrome" } }
+    },
+    {
+      "id": "microfacet",
+      "operator": "microfacet-scatter",
+      "bind": {
+        "roughness": { "field": "convection-roughness" },
+        "anisotropy": { "field": "flow-anisotropy" }
+      }
+    },
+    {
+      "id": "heat",
+      "operator": "volume-emission",
+      "bind": {
+        "density": { "param": "emit-density" },
+        "temperature": { "param": "temperature" }
+      }
+    },
+    {
+      "id": "view",
+      "operator": "view-dependent-weight",
+      "bind": {
+        "exponent": { "param": "view-exp" },
+        "lobe": { "param": "view-lobe" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "metal", "to": "microfacet" },
+      { "from": "microfacet", "to": "view" },
+      { "from": "heat", "to": "display" },
+      { "from": "view", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "A", "observer": "CIE-1931-2deg" }
+}

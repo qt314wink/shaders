@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shader-grammar.dev/schemas/v0.1/operator.schema.json",
+  "title": "Shader Grammar Operator",
+  "description": "A closed-catalog optical operator. Operator ids name physical mechanisms (thin-film-interference, volume-scattering), never materials (oil-slick, nacre). An operator declares typed slots; recipes bind those slots to parameters or fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "unevaluatedProperties": false,
+  "required": ["id", "title", "family", "description", "slots", "outputs"],
+  "propertyNames": {
+    "pattern": "^(id|title|family|description|slots|outputs|references|reusable)$"
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "not": {
+        "enum": [
+          "oil-slick",
+          "soap-film",
+          "nacre",
+          "labradorite",
+          "butterfly-structural-color",
+          "holographic-foil",
+          "bismuth-oxide",
+          "molten-chrome",
+          "caustic-water",
+          "cloud",
+          "nebula",
+          "opalescent-glass"
+        ]
+      }
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "family": {
+      "type": "string",
+      "enum": [
+        "interference",
+        "diffraction",
+        "interface",
+        "geometric",
+        "volume",
+        "evaluation"
+      ]
+    },
+    "description": { "type": "string", "minLength": 24 },
+    "reusable": {
+      "type": "boolean",
+      "description": "True if this operator is a shared primitive intended for more than one material. v0.1 requires true for every catalog entry."
+    },
+    "slots": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/slot" }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "spectral-radiance",
+          "bsdf-lobe",
+          "throughput",
+          "weight",
+          "display-rgb"
+        ]
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "required"],
+      "properties": {
+        "kind": { "$ref": "https://shader-grammar.dev/schemas/v0.1/parameter.schema.json#/$defs/kind" },
+        "unit": { "$ref": "https://shader-grammar.dev/schemas/v0.1/parameter.schema.json#/$defs/unit" },
+        "required": { "type": "boolean" },
+        "field": {
+          "type": "string",
+          "enum": ["forbidden", "allowed", "required"],
+          "description": "Whether this slot may be driven by a field instead of a constant parameter."
+        },
+        "enumValues": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

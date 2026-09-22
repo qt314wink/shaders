@@ -1,0 +1,48 @@
+{
+  "id": "minimal-thin-film",
+  "version": "0.1.0",
+  "title": "Minimal thin film",
+  "taxonomyIds": ["thin-film"],
+  "summary": "Smallest legal recipe: one thickness field, two-interface interference, spectral display. Used as a positive control for the validator.",
+  "fields": [
+    {
+      "id": "d",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "constant", "generator": "constant", "value": 250 },
+      "range": [250, 250]
+    }
+  ],
+  "parameters": [
+    { "id": "n0", "kind": "ior-real", "unit": "dimensionless", "value": 1.0 },
+    { "id": "n1", "kind": "ior-real", "unit": "dimensionless", "value": 1.4 },
+    { "id": "n2", "kind": "ior-real", "unit": "dimensionless", "value": 1.5 },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "film",
+      "operator": "thin-film-interference",
+      "bind": {
+        "thickness": { "field": "d" },
+        "nIncident": { "param": "n0" },
+        "nFilm": { "param": "n1" },
+        "nExit": { "param": "n2" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [{ "from": "film", "to": "display" }]
+  }
+}

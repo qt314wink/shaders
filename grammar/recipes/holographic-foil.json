@@ -1,0 +1,87 @@
+{
+  "id": "holographic-foil",
+  "version": "0.1.0",
+  "title": "Holographic foil",
+  "taxonomyIds": ["grating", "thin-film", "conductor-interface"],
+  "summary": "Embossed PET over aluminum. Spectral orders come from the grating; a lacquer film adds Airy modulation; the metal is conductor Fresnel. No holographic boolean.",
+  "phenomena": ["diffraction", "thin-film-interference", "conductor-fresnel"],
+  "fields": [
+    {
+      "id": "groove-orientation",
+      "kind": "angle",
+      "unit": "rad",
+      "domain": "surface",
+      "source": { "type": "analytic", "generator": "anisotropic-orientation", "frequency": 1 },
+      "range": [0, 3.1416]
+    },
+    {
+      "id": "lacquer-thickness",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 2, "frequency": 5 },
+      "range": [180, 420]
+    }
+  ],
+  "parameters": [
+    { "id": "n-air", "kind": "ior-real", "unit": "dimensionless", "value": 1.0003 },
+    { "id": "n-pet", "kind": "ior-real", "unit": "dimensionless", "value": 1.58 },
+    { "id": "n-lacquer", "kind": "ior-real", "unit": "dimensionless", "value": 1.5 },
+    { "id": "period", "kind": "period", "unit": "um", "value": 0.85, "range": [0.5, 1.6] },
+    { "id": "groove-depth", "kind": "length", "unit": "nm", "value": 140 },
+    { "id": "orders", "kind": "count", "unit": "dimensionless", "value": 4 },
+    {
+      "id": "ior-aluminum",
+      "kind": "ior-complex",
+      "unit": "dimensionless",
+      "complex": { "n": 0.9, "k": 6.5 },
+      "notes": "Visible-band aluminum, approximate."
+    },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "grating",
+      "operator": "diffraction-grating",
+      "bind": {
+        "period": { "param": "period" },
+        "depth": { "param": "groove-depth" },
+        "orientation": { "field": "groove-orientation" },
+        "orders": { "param": "orders" }
+      }
+    },
+    {
+      "id": "lacquer",
+      "operator": "thin-film-interference",
+      "bind": {
+        "thickness": { "field": "lacquer-thickness" },
+        "nIncident": { "param": "n-air" },
+        "nFilm": { "param": "n-lacquer" },
+        "nExit": { "param": "n-pet" }
+      }
+    },
+    {
+      "id": "metal",
+      "operator": "fresnel-conductor",
+      "bind": { "ior": { "param": "ior-aluminum" } }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "grating", "to": "display" },
+      { "from": "lacquer", "to": "display" },
+      { "from": "metal", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

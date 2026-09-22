@@ -1,0 +1,83 @@
+{
+  "id": "bismuth-oxide",
+  "version": "0.1.0",
+  "title": "Bismuth oxide",
+  "taxonomyIds": ["thin-film", "conductor-interface", "microfacet"],
+  "summary": "An oxide film on bismuth metal. Iridescent tarnish is thin-film interference against a conductor Fresnel exit medium, with hopper-crystal roughness — the same film operator as oil and soap.",
+  "phenomena": ["thin-film-interference", "conductor-fresnel"],
+  "fields": [
+    {
+      "id": "oxide-thickness",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "worley", "frequency": 4.5 },
+      "range": [40, 380],
+      "notes": "Oxidation fronts follow hopper steps, so thickness is cellular rather than smoothly fbm."
+    },
+    {
+      "id": "hopper-roughness",
+      "kind": "roughness",
+      "unit": "dimensionless",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "worley", "frequency": 3.2 },
+      "range": [0.08, 0.45]
+    }
+  ],
+  "parameters": [
+    { "id": "n-air", "kind": "ior-real", "unit": "dimensionless", "value": 1.0003 },
+    { "id": "n-oxide", "kind": "ior-real", "unit": "dimensionless", "value": 2.15, "range": [1.9, 2.5] },
+    { "id": "n-exit-proxy", "kind": "ior-real", "unit": "dimensionless", "value": 1.8, "notes": "Real part of the metal used as film exit IOR; the conductor node carries the complex pair." },
+    {
+      "id": "ior-bismuth",
+      "kind": "ior-complex",
+      "unit": "dimensionless",
+      "complex": { "n": 1.8, "k": 3.4 }
+    },
+    { "id": "anisotropy", "kind": "anisotropy", "unit": "dimensionless", "value": 0.15 },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "oxide",
+      "operator": "thin-film-interference",
+      "bind": {
+        "thickness": { "field": "oxide-thickness" },
+        "nIncident": { "param": "n-air" },
+        "nFilm": { "param": "n-oxide" },
+        "nExit": { "param": "n-exit-proxy" }
+      }
+    },
+    {
+      "id": "metal",
+      "operator": "fresnel-conductor",
+      "bind": { "ior": { "param": "ior-bismuth" } }
+    },
+    {
+      "id": "microfacet",
+      "operator": "microfacet-scatter",
+      "bind": {
+        "roughness": { "field": "hopper-roughness" },
+        "anisotropy": { "param": "anisotropy" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "oxide", "to": "display" },
+      { "from": "metal", "to": "microfacet" },
+      { "from": "microfacet", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

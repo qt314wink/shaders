@@ -1,0 +1,70 @@
+{
+  "id": "soap-film",
+  "version": "0.1.0",
+  "title": "Soap film",
+  "taxonomyIds": ["thin-film", "dielectric-interface", "view-weight"],
+  "summary": "A surfactant film in air. Same two-interface operator as oil slick; the stack is air/film/air, thickness drains toward a black film, and there is no metal and no pigment.",
+  "phenomena": ["thin-film-interference", "view-dependent-color", "variable-thickness", "dielectric-fresnel"],
+  "fields": [
+    {
+      "id": "film-thickness",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "analytic", "generator": "drainage", "frequency": 0.15 },
+      "range": [8, 1200],
+      "notes": "Gravity and evaporation thin the film. Below ~10 nm the film goes black (destructive interference of all visible λ)."
+    }
+  ],
+  "parameters": [
+    { "id": "n-air", "kind": "ior-real", "unit": "dimensionless", "value": 1.0003 },
+    { "id": "n-film", "kind": "ior-real", "unit": "dimensionless", "value": 1.35, "range": [1.33, 1.42], "notes": "Water plus surfactant. Lower than hydrocarbon oil." },
+    { "id": "view-exp", "kind": "weight", "unit": "dimensionless", "value": 2.4 },
+    { "id": "view-lobe", "kind": "lobe", "unit": "enum", "enum": "grazing" },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "film",
+      "operator": "thin-film-interference",
+      "bind": {
+        "thickness": { "field": "film-thickness" },
+        "nIncident": { "param": "n-air" },
+        "nFilm": { "param": "n-film" },
+        "nExit": { "param": "n-air" }
+      }
+    },
+    {
+      "id": "interface",
+      "operator": "fresnel-dielectric",
+      "bind": { "ior": { "param": "n-film" } }
+    },
+    {
+      "id": "view",
+      "operator": "view-dependent-weight",
+      "bind": {
+        "exponent": { "param": "view-exp" },
+        "lobe": { "param": "view-lobe" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "film", "to": "view" },
+      { "from": "interface", "to": "view" },
+      { "from": "view", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" },
+  "notes": "Oil slick and soap film share thin-film-interference. They differ by n-exit (water vs air), n-film, thickness generator, and view lobe."
+}

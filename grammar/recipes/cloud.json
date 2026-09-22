@@ -1,0 +1,62 @@
+{
+  "id": "cloud",
+  "version": "0.1.0",
+  "title": "Cloud",
+  "taxonomyIds": ["scattering", "absorption"],
+  "summary": "Water-droplet Mie scattering in a density field. White appearance is high albedo plus forward-peaked phase, not a cloud shader. Shares volume-scattering with nebula and opalescent glass.",
+  "phenomena": ["mie-scattering", "spectral-absorption"],
+  "fields": [
+    {
+      "id": "droplet-density",
+      "kind": "density",
+      "unit": "kg/m3",
+      "domain": "volume",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 5, "frequency": 1.3 },
+      "range": [0.0, 0.8]
+    }
+  ],
+  "parameters": [
+    { "id": "sigma-s", "kind": "scattering-coeff", "unit": "1/m", "value": 12.0 },
+    { "id": "sigma-a", "kind": "extinction", "unit": "1/m", "value": 0.04 },
+    { "id": "phase", "kind": "phase-function", "unit": "enum", "enum": "mie" },
+    { "id": "g", "kind": "anisotropy", "unit": "dimensionless", "value": 0.85, "notes": "Large droplets are strongly forward-scattering." },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "scatter",
+      "operator": "volume-scattering",
+      "bind": {
+        "density": { "field": "droplet-density" },
+        "sigmaS": { "param": "sigma-s" },
+        "phase": { "param": "phase" },
+        "g": { "param": "g" }
+      }
+    },
+    {
+      "id": "absorb",
+      "operator": "volume-absorption",
+      "bind": {
+        "density": { "field": "droplet-density" },
+        "sigmaA": { "param": "sigma-a" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "scatter", "to": "display" },
+      { "from": "absorb", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

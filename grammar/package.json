@@ -1,0 +1,19 @@
+{
+  "name": "shader-grammar",
+  "version": "0.1.0",
+  "private": false,
+  "description": "An ontology of shared optical primitives for describing materials without named-effect flags.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qt314wink/shader-grammar.git"
+  },
+  "scripts": {
+    "validate": "node tools/validate.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "yaml": "^2.8.0"
+  }
+}

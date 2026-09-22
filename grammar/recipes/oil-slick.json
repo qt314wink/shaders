@@ -1,0 +1,89 @@
+{
+  "id": "oil-slick",
+  "version": "0.1.0",
+  "title": "Oil slick",
+  "taxonomyIds": ["thin-film", "dielectric-interface", "caustics", "view-weight"],
+  "summary": "A spreading hydrocarbon film on water. Color is two-interface interference whose optical path varies with thickness; wave displacement under the film reuses caustic transport.",
+  "phenomena": ["thin-film-interference", "view-dependent-color", "variable-thickness", "caustics", "dielectric-fresnel"],
+  "fields": [
+    {
+      "id": "film-thickness",
+      "kind": "thickness",
+      "unit": "nm",
+      "domain": "surface",
+      "source": { "type": "procedural", "generator": "fbm", "octaves": 4, "frequency": 2.4 },
+      "range": [80, 900],
+      "notes": "Spreading and wind set the local optical path. Typical crude-oil slicks sit in the 100–1000 nm band."
+    },
+    {
+      "id": "wave-displacement",
+      "kind": "length",
+      "unit": "mm",
+      "domain": "surface",
+      "source": { "type": "analytic", "generator": "surface-waves", "frequency": 0.7 },
+      "range": [-8, 8]
+    }
+  ],
+  "parameters": [
+    { "id": "n-air", "kind": "ior-real", "unit": "dimensionless", "value": 1.0003 },
+    { "id": "n-oil", "kind": "ior-real", "unit": "dimensionless", "value": 1.47, "range": [1.4, 1.55], "notes": "Typical hydrocarbon film." },
+    { "id": "n-water", "kind": "ior-real", "unit": "dimensionless", "value": 1.333 },
+    { "id": "view-exp", "kind": "weight", "unit": "dimensionless", "value": 1.8 },
+    { "id": "view-lobe", "kind": "lobe", "unit": "enum", "enum": "fresnel" },
+    { "id": "caustic-focus", "kind": "weight", "unit": "dimensionless", "value": 0.55 },
+    { "id": "illuminant", "kind": "illuminant", "unit": "enum", "enum": "D65" },
+    { "id": "observer", "kind": "observer", "unit": "enum", "enum": "CIE-1931-2deg" }
+  ],
+  "nodes": [
+    {
+      "id": "film",
+      "operator": "thin-film-interference",
+      "bind": {
+        "thickness": { "field": "film-thickness" },
+        "nIncident": { "param": "n-air" },
+        "nFilm": { "param": "n-oil" },
+        "nExit": { "param": "n-water" }
+      }
+    },
+    {
+      "id": "interface",
+      "operator": "fresnel-dielectric",
+      "bind": { "ior": { "param": "n-oil" } }
+    },
+    {
+      "id": "caustics",
+      "operator": "caustic-transport",
+      "bind": {
+        "displacement": { "field": "wave-displacement" },
+        "ior": { "param": "n-water" },
+        "focusScale": { "param": "caustic-focus" }
+      }
+    },
+    {
+      "id": "view",
+      "operator": "view-dependent-weight",
+      "bind": {
+        "exponent": { "param": "view-exp" },
+        "lobe": { "param": "view-lobe" }
+      }
+    },
+    {
+      "id": "display",
+      "operator": "spectral-integrate",
+      "bind": {
+        "illuminant": { "param": "illuminant" },
+        "observer": { "param": "observer" }
+      }
+    }
+  ],
+  "graph": {
+    "output": "display",
+    "edges": [
+      { "from": "film", "to": "view" },
+      { "from": "interface", "to": "view" },
+      { "from": "caustics", "to": "display" },
+      { "from": "view", "to": "display" }
+    ]
+  },
+  "evaluation": { "illuminant": "D65", "observer": "CIE-1931-2deg" }
+}

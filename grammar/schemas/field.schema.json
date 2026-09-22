@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shader-grammar.dev/schemas/v0.1/field.schema.json",
+  "title": "Shader Grammar Field",
+  "description": "A spatially, temporally, spectrally, or angularly varying quantity of a parameter kind. Fields describe how a physical quantity is distributed — not a named look.",
+  "type": "object",
+  "additionalProperties": false,
+  "unevaluatedProperties": false,
+  "required": ["id", "kind", "unit", "domain", "source"],
+  "propertyNames": {
+    "pattern": "^(id|kind|unit|domain|source|range|notes)$"
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "kind": { "$ref": "https://shader-grammar.dev/schemas/v0.1/parameter.schema.json#/$defs/kind" },
+    "unit": { "$ref": "https://shader-grammar.dev/schemas/v0.1/parameter.schema.json#/$defs/unit" },
+    "domain": {
+      "type": "string",
+      "enum": ["surface", "volume", "spectral", "angular", "temporal"],
+      "description": "Where the field is defined. A thickness field is typically surface; density is volume; emission lines are spectral."
+    },
+    "source": { "$ref": "#/$defs/source" },
+    "range": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["constant", "procedural", "analytic", "sampled"],
+          "description": "How the field is produced. Generators are geometric/physical, never material names."
+        },
+        "generator": {
+          "type": "string",
+          "enum": [
+            "fbm",
+            "worley",
+            "gradient",
+            "drainage",
+            "lamellar-tilt",
+            "surface-waves",
+            "anisotropic-orientation",
+            "spectral-peak",
+            "radial",
+            "constant"
+          ]
+        },
+        "octaves": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "frequency": { "type": "number", "exclusiveMinimum": 0 },
+        "value": { "type": "number" },
+        "peaksNm": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "bandwidthNm": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    }
+  }
+}
